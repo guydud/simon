@@ -13,8 +13,8 @@ floorh dw 40
 x dw 40
 y dw 40
 Clock equ es:6Ch
-GAME_OVER DB 'GAME OVER                               press the mouse to start again          your score:','$'
-START_SCREEN DB 'Simon                                   press the mouse to start                                                        press 1 for green, press 2 for red      press 3 for yellow, press 4 for blue','$'
+GAME_OVER DB 'GAME OVER                               press space to start again              your score:','$'
+START_SCREEN DB 'Simon                                   press space to start                                                            press 1 for green, press 2 for red      press 3 for yellow, press 4 for blue','$'
 block DB ' ',13,'$'
 note dw 0c71h
 note1 dw 0ba6h
@@ -41,18 +41,12 @@ lea DX,[GAME_OVER]
 int 21h
 lea DX,[TEXTPOINTS]
 int 21h           
-; Initializes the mouse
-mov ax,0h
-int 33h
-; Show mouse
-mov ax,1h
-int 33h
-; Loop until mouse click
-MouseLP1 :
-mov ax,3h
-int 33h
-cmp bx, 01h ; check left mouse click
-jne MouseLP1
+; Loop until space click
+space1 :
+mov ah, 0
+int 16h
+cmp al, 20h ; check  space click
+jne space1
 call startjump
 pop ax
 pop cx
@@ -222,18 +216,12 @@ int 10h
 mov ah,09h                      
 lea DX,[START_SCREEN]  
 int 21h          
-; Initializes the mouse
-mov ax,0h
-int 33h
-; Show mouse
-mov ax,1h
-int 33h
-; Loop until mouse click
-MouseLP2 :
-mov ax,3h
-int 33h
-cmp bx, 01h ; check left mouse click
-jne MouseLP2
+; Loop until space click
+space2 :
+mov ah, 0
+int 16h
+cmp al, 20h ; check  space click
+jne space2
 call whitescreen
 ret
 endp startscreen
@@ -284,13 +272,13 @@ endp click1
 proc points1
 INC [POINTS] 
 XOR AX,AX
-MOV AL,POINTS 
+MOV AL,[POINTS] 
 ADD AL,30h                       ;AL,'2'
 MOV [TEXTPOINTS],AL
 MOV AH,09h                      
-LEA DX,POINTS    
+LEA DX,[POINTS]   
 INT 21h   
-LEA DX,block   
+LEA DX,[block]   
 INT 21h 
 ret
 endp points1
@@ -820,7 +808,7 @@ call cube
 
 mov ax, 40h
 mov es, ax
-mov ax, es:6Ch
+mov ax, [es:6Ch]
 and al, 00000001b 
 
 cmp al,0
